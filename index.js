@@ -1,10 +1,14 @@
 const express = require('express');
 const app = express();
 const port = 8000;
-const expressLayouts = require('express-ejs-layouts');app.use('/', require('./routes'));app.use('/', require('./routes'));
+const expressLayouts = require('express-ejs-layouts');
 
 // ejs layouts middleware
 app.use(expressLayouts);
+app.set('layout extractStyles', true);
+app.set('layout extractScripts', true);
+// assets middleware
+app.use(express.static('./assets'));
 //routing middleware
 app.use('/', require('./routes'));
 
