@@ -1,9 +1,15 @@
 const express = require('express');
 const app = express();
+const cookieParser = require('cookie-parser');
 const port = 8000;
 const expressLayouts = require('express-ejs-layouts');
 const db = require('./config/mongoose');
 
+
+// for form
+app.use(express.urlencoded({ useNewUrlParser: true }));
+// for cookies
+app.use(cookieParser());
 // ejs layouts middleware
 app.use(expressLayouts);
 app.set('layout extractStyles', true);

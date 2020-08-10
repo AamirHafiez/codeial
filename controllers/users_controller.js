@@ -1,7 +1,24 @@
+const User = require('../models/user');
+
 module.exports.profile = function(req, res){
-    return res.render('profile', {
-        title: 'codeial | profile'
-    });
+    if(req.cookies.user_id){
+        User.findById(req.cookies.user_id, function(err, user){
+            if(err){
+                console.log('Error in finding user by cookie');
+                return;
+            }
+            if(user){
+                return res.render('profile', {
+                    title: 'codeial | profile',
+                    user: user
+                });
+            }else{
+                return res.redirect('/users/sign-in');
+            }
+        });
+    }else{
+        return res.redirect('/users/sign-in');
+    }
 }
 
 module.exports.signIn = function(req, res){
@@ -16,10 +33,46 @@ module.exports.signUp = function(req, res){
     });
 }
 
+//create a user in User Schema (Sign Up)
 module.exports.create = function(req, res){
+    if(req.body.password != req.body.confirm_password){
+        res.redirect('back');
+    }
 
+    User.findOne({email: req.body.email}, function(err, user){
+        if(err){
+            console.log('Error in finding user in User Database');
+            return;
+        }
+        if(user){
+            return res.redirect('back');
+        }else{
+            User.create(req.body, function(err, user){
+                if(err){
+                    console.log('Error in creating user');
+                    return;
+                }
+                return res.redirect('/users/sign-in');
+            });
+        }
+    });
 }
 
 module.exports.createSession = function(req, res){
-
+    User.findOne({email: req.body.email}, function(err, user){
+        if(err){
+            console.log('Error in finding user in DataBase');
+            return;
+        }
+        if(user){
+            if(user.password != req.body.password){
+                return res.redirect('back');
+            }else{
+                res.cookie('user_id', user._id);
+                return res.redirect('/users/profile');
+            }
+        }else{
+            return res.redirect('back');
+        }
+    });
 }
