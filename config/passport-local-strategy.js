@@ -1,6 +1,5 @@
 const User = require('../models/user');
 const passport = require('passport');
-const User = require('../models/user');
 const LocalStrategy = require('passport-local').Strategy;
 
 passport.use(new LocalStrategy({
@@ -36,5 +35,29 @@ passport.deserializeUser(function(id, done){
         return done(null, user);
     });
 });
+
+//check if user authenticated
+passport.checkAuthentication = function(req, res, next){
+    if(req.isAuthenticated()){
+        return next();
+    }
+    return res.redirect('/users/sign-in');
+}
+
+//check if user is not Authenticated
+passport.notAuthenticated = function(req, res, next){
+    if(!req.isAuthenticated()){
+        return next();
+    }
+    return res.redirect('/users/profile');
+}
+
+//to set user for the views
+passport.setAuthenticatedUser = function(req, res, next){
+    if(req.isAuthenticated()){
+        res.locals.user = req.user;
+    }
+    next();
+}
 
 module.exports = passport;

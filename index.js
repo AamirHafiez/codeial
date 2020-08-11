@@ -4,18 +4,48 @@ const cookieParser = require('cookie-parser');
 const port = 8000;
 const expressLayouts = require('express-ejs-layouts');
 const db = require('./config/mongoose');
-
+const session = require('express-session');
+const passport = require('passport');
+const passportLocal = require('./config/passport-local-strategy');
+const MongoStore = require('connect-mongo')(session);
 
 // for form
 app.use(express.urlencoded({ useNewUrlParser: true }));
+
 // for cookies
 app.use(cookieParser());
+
 // ejs layouts middleware
 app.use(expressLayouts);
 app.set('layout extractStyles', true);
 app.set('layout extractScripts', true);
+
 // assets middleware
 app.use(express.static('./assets'));
+
+//for express session using passport
+app.use(session({
+    name: 'codeial',
+    secret: 'aamirhafiez',
+    saveUninitialized: false,
+    resave: false,
+    cookie:{
+        maxAge: (1000 * 60 * 100)
+    },
+    store: new MongoStore(
+        {
+            mongooseConnection: db,
+            autoRemove: 'disabled'
+        },
+        function(err){
+            console.log(err || 'connect-mongodb is OK');
+        }
+    )
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(passport.setAuthenticatedUser);
+
 //routing middleware
 app.use('/', require('./routes'));
 
