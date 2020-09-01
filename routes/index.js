@@ -6,6 +6,7 @@ console.log('Yipee!! Router is loaded');
 
 router.use('/users', require('./users.js'));
 router.use('/posts', require('./posts.js'));
+router.use('/comments', require('./comment'));
 router.get('/', homeController.home);
 
 module.exports = router;
